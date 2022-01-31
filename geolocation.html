@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>MAP API</title>
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.css" type="text/css">
+
+
+<div id='map' style='width: 400px; height: 300px;'></div>
+<div id="location"></div>
+<script>
+  // .env used to hide api key
+  // longitude, latitude
+  // https://api.mapbox.com/geocoding/v5/mapbox.places/-121.043%2C%2014.7221.json? access_token=pk.eyJ1IjoiamVsbHliZWFucy1zbHkiLCJhIjoiY2t4NmVnYXU5MnJkNjJ1cW92ZDN1b3hndiJ9.FgwIbfJQOkbfbc1OtJHv2Q
+
+  let myLocation = document.querySelector('#location');
+
+  navigator.geolocation.getCurrentPosition(function(pos){
+     success(pos.coords.latitude, pos.coords.longitude);
+  },
+  function(){
+     fail();
+  });
+
+  function success(lat, lng){
+     console.log(lat + ", " + lng);
+     mapboxgl.accessToken = 'pk.eyJ1IjoiamVsbHliZWFucy1zbHkiLCJhIjoiY2t4NmVnYXU5MnJkNjJ1cW92ZDN1b3hndiJ9.FgwIbfJQOkbfbc1OtJHv2Q';
+     var map = new mapboxgl.Map({
+         container: 'map',
+         style: 'mapbox://styles/mapbox/streets-v11',
+     center: [lng, lat],
+     zoom: 15
+     });
+
+     const geocoder = new MapboxGeocoder({
+         accessToken: mapboxgl.accessToken,
+         marker: {
+            color: 'orange'
+         },
+         mapboxgl: mapboxgl,
+         center: [lng, lat],
+         zoom: 15,
+         container: 'map'
+     });
+
+     map.addControl(geocoder);
+     var myLngLat = [lng, lat];
+ 
+     new mapboxgl.Marker({ color: 'red' })
+                 .setLngLat(myLngLat)
+                 .addTo(map);
+
+     let myLongitude = geocoder.options.proximity.longitude;
+     let myLatitude = geocoder.options.proximity.latitude;
+    
+     myLocation.innerHTML = `Longitude: ${myLongitude}<br/> Latitude: ${myLatitude}`;
+     console.log(geocoder.options);
+     
+  }
+
+  function fail(){
+     console.log("failed");
+  }
+
+</script>
+
+</body>
+</html>
